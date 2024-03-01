@@ -1,0 +1,38 @@
+name: build
+
+on:
+  push:
+    branches:
+      - main
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Test API layer
+      run: dotnet test src/LaLigaAPI.UnitTests/LaLigaAPI.UnitTests.csproj
+
+    - name: Test Application layer
+      run: dotnet test src/LaLigaApplication.UnitTests/LaLigaApplication.UnitTests.csproj
+
+    - name: Test Domain layer
+      run: dotnet test src/LaLigaDomain.UnitTests/LaLigaDomain.UnitTests.csproj
+
+    - name: Test Infraestructure layer
+      run: dotnet test src/LaLigaInfraestructure.UnitTests/LaLigaInfraestructure.UnitTests.csproj
+
+    - name: Test Integration tests
+      run: dotnet test src/LaLiga.IntegrationTests/LaLiga.IntegrationTests.csproj
+
+    - name: Build project
+      run: dotnet build src/LaLigaAPI/LaLigaAPI.csproj --configuration Release
+

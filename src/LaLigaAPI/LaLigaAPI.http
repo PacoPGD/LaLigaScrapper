@@ -1,0 +1,6 @@
+@LaLigaAPI_HostAddress = http://localhost:5242
+
+GET {{LaLigaAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
