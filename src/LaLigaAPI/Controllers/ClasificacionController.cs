@@ -7,20 +7,15 @@ namespace LaLigaAPI.Controllers
     /// <summary>
     /// Controlador para obtener la clasificación de equipos.
     /// </summary>
+    /// <remarks>
+    /// Constructor del controlador de clasificación.
+    /// </remarks>
+    /// <param name="service">Servicio de clasificación.</param>
     [Route("[controller]")]
     [ApiController]
-    public class ClasificacionController : ControllerBase
+    public class ClasificacionController(IClasificacionService service) : ControllerBase
     {
-        private readonly IClasificacionService _service;
-
-        /// <summary>
-        /// Constructor del controlador de clasificación.
-        /// </summary>
-        /// <param name="service">Servicio de clasificación.</param>
-        public ClasificacionController(IClasificacionService service)
-        {
-            _service = service;
-        }
+        private readonly IClasificacionService _service = service;
 
         /// <summary>
         /// Obtiene la clasificación de equipos.

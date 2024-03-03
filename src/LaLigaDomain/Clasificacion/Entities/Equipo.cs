@@ -8,7 +8,7 @@
         /// <summary>
         /// Nombre del equipo.
         /// </summary>
-        public string Nombre { get; set; }
+        public required string Nombre { get; set; }
 
         /// <summary>
         /// Posición del equipo en la clasificación.

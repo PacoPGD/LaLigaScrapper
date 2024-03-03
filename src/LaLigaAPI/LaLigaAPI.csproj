@@ -19,4 +19,7 @@
     <ProjectReference Include="..\LaLigaApplication\LaLigaApplication.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+		<InternalsVisibleTo Include="LaLigaAPI.UnitTests" />
+  </ItemGroup>
 </Project>
