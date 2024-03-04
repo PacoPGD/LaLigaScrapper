@@ -1,17 +1,18 @@
 ﻿using HtmlAgilityPack;
 using LaLigaApplication.Clasificacion.DTOs;
 using LaLigaDomain.Clasificacion.Entities;
+using LaLigaInfraestructure.Redis;
 using Microsoft.Extensions.Logging;
-using System.Net;
 
 namespace LaLigaApplication.Clasificacion.Services
 {
     /// <summary>
     /// Servicio para obtener la clasificación de equipos.
     /// </summary>
-    public class ClasificacionService(ILogger<ClasificacionService> logger) : IClasificacionService
+    public class ClasificacionService(ILogger<ClasificacionService> logger, IRedisService redisService) : IClasificacionService
     {
         private readonly ILogger<ClasificacionService> _logger = logger;
+        private readonly IRedisService _redisService = redisService;
 
         /// <summary>
         /// Obtiene la clasificación de equipos desde una URL externa.
@@ -21,9 +22,16 @@ namespace LaLigaApplication.Clasificacion.Services
         {
             try
             {
-                string url = "https://www.sport.es/resultados/futbol/primera-division/clasificacion-liga.html";
-                var document = await LoadDocumentFromUrl(url);
-                var equiposData = ExtractEquiposData(document);
+                var equiposData = await _redisService.GetFromRedis<List<Equipo>>("LaLiga");
+
+                if (equiposData == null)
+                {
+                    string url = "https://www.sport.es/resultados/futbol/primera-division/clasificacion-liga.html";
+                    var document = await LoadDocumentFromUrl(url);
+                    equiposData = ExtractEquiposData(document);
+                    await _redisService.SaveInRedis("LaLiga", equiposData);
+                }
+
                 return equiposData.Select(equipo =>
                 {
                     return new GetEquipoResponse
@@ -38,6 +46,7 @@ namespace LaLigaApplication.Clasificacion.Services
                 throw new ClasificacionServiceException("Error al obtener la clasificación", ex);
             }
         }
+       
 
         /// <summary>
         /// Carga la página web a partir de la url proporcionada

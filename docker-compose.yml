@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  laligaapi:
+    image: ${DOCKER_REGISTRY-}laligaapi
+    build:
+      context: .
+      dockerfile: src/LaLigaAPI/Dockerfile
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:
