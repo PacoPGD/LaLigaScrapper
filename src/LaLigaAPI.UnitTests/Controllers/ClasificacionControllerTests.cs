@@ -22,24 +22,30 @@ namespace LaLigaAPI.UnitTests.Controllers
         {
             // Arrange
             var mockService = new Mock<IClasificacionService>();
+
             mockService.Setup(service => service.GetClasificacion())
-                       .ReturnsAsync([
-                           new GetEquipoResponse
+                       .ReturnsAsync(new GetClasificacionResponse
+                       {
+                           Clasificacion = new ClasificacionDeLiga
                            {
-                                Equipo = new Equipo
-                                {
-                                    Nombre = "Los satanases del infierno",
-                                    Posicion = 1,
-                                    PartidosJugados = 0,
-                                    PartidosGanados = 0,
-                                    PartidosEmpatados = 0,
-                                    PartidosPerdidos = 0,
-                                    Puntos = 0,
-                                    GolesFavor = 0,
-                                    GolesContra = 0
-                                }
+                               Equipos = new List<Equipo>
+                               {
+                                   new Equipo
+                                   {
+                                       Nombre = "Los satanases del infierno",
+                                       Posicion = 1,
+                                       PartidosJugados = 0,
+                                       PartidosGanados = 0,
+                                       PartidosEmpatados = 0,
+                                       PartidosPerdidos = 0,
+                                       Puntos = 0,
+                                       GolesFavor = 0,
+                                       GolesContra = 0
+                                   }
+                               },
+                               LastUpdated = DateTime.Now
                            }
-                       ]);
+                       });
 
             var controller = new ClasificacionController(mockService.Object);
 
@@ -50,7 +56,7 @@ namespace LaLigaAPI.UnitTests.Controllers
             Assert.That(result, Is.InstanceOf<OkObjectResult>());
             var okResult = (OkObjectResult)result;
             Assert.That(okResult.Value, Is.Not.Null);
-            Assert.That(okResult.Value, Is.InstanceOf<List<GetEquipoResponse>>());
+            Assert.That(okResult.Value, Is.InstanceOf<GetClasificacionResponse>());
 
         }
     }

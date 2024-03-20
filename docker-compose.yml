@@ -7,11 +7,15 @@ services:
       context: .
       dockerfile: src/LaLigaAPI/Dockerfile
   redis:
-    image: redis:latest
+    image: redis:alpine3.19
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
+  redis-insight:
+    image: redislabs/redisinsight:v2
+    ports:
+      - "5540:5540"
 
 volumes:
   redis_data:

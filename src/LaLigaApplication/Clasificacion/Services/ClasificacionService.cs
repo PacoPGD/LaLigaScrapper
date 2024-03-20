@@ -18,27 +18,30 @@ namespace LaLigaApplication.Clasificacion.Services
         /// Obtiene la clasificación de equipos desde una URL externa.
         /// </summary>
         /// <returns>Lista de equipos con su clasificación.</returns>
-        public async Task<List<GetEquipoResponse>> GetClasificacion()
+        public async Task<GetClasificacionResponse> GetClasificacion()
         {
             try
             {
-                var equiposData = await _redisService.GetFromRedis<List<Equipo>>("LaLiga");
+                var equiposData = await _redisService.GetFromRedis<ClasificacionDeLiga>("LaLiga");
 
-                if (equiposData == null)
+                if (equiposData == null || MustUpdate(equiposData.LastUpdated))
                 {
                     string url = "https://www.sport.es/resultados/futbol/primera-division/clasificacion-liga.html";
                     var document = await LoadDocumentFromUrl(url);
-                    equiposData = ExtractEquiposData(document);
+                    equiposData = new ClasificacionDeLiga
+                    {
+                        Equipos = ExtractEquiposData(document),
+                        LastUpdated = DateTime.Now
+                    };
+
                     await _redisService.SaveInRedis("LaLiga", equiposData);
                 }
 
-                return equiposData.Select(equipo =>
+                return new GetClasificacionResponse
                 {
-                    return new GetEquipoResponse
-                    {
-                        Equipo = equipo
-                    };
-                }).ToList();
+                    Clasificacion = equiposData
+                };
+                
             }
             catch (Exception ex)
             {
@@ -112,6 +115,17 @@ namespace LaLigaApplication.Clasificacion.Services
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Indica si hay que actualizar la clasificación porque ya pasó el domingo
+        /// </summary>
+        /// <returns>Debe actualizar o no</returns>
+        private bool MustUpdate(DateTime lastUpdated)
+        {
+            var nextSunday = lastUpdated.AddDays((int)DayOfWeek.Sunday - (int)lastUpdated.DayOfWeek).AddDays(7);
+
+            return DateTime.Now > nextSunday;
         }
     }
 }

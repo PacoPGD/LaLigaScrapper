@@ -22,7 +22,7 @@ namespace LaLigaAPI.Controllers
         /// </summary>
         /// <returns>Clasificación de equipos.</returns>
         [HttpGet]
-        [ProducesResponseType(typeof(GetEquipoResponse), 200)]
+        [ProducesResponseType(typeof(GetClasificacionResponse), 200)]
         [Route("Get")]
         public async Task<IActionResult> GetClasificacion()
         {

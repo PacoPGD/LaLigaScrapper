@@ -31,8 +31,9 @@ namespace LaLigaApplication.UnitTests.Clasificacion.Services
 
             // Assert
             Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.InstanceOf<List<GetEquipoResponse>>());
-            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Is.InstanceOf<GetClasificacionResponse>());
+            Assert.That(result.Clasificacion.Equipos, Is.Not.Null);
+            Assert.That(result.Clasificacion.Equipos, Is.Not.Empty);
         }
 
 
