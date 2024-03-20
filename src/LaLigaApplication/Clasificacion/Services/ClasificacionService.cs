@@ -1,36 +1,47 @@
 ﻿using HtmlAgilityPack;
 using LaLigaApplication.Clasificacion.DTOs;
 using LaLigaDomain.Clasificacion.Entities;
+using LaLigaInfraestructure.Redis;
 using Microsoft.Extensions.Logging;
-using System.Net;
 
 namespace LaLigaApplication.Clasificacion.Services
 {
     /// <summary>
     /// Servicio para obtener la clasificación de equipos.
     /// </summary>
-    public class ClasificacionService(ILogger<ClasificacionService> logger) : IClasificacionService
+    public class ClasificacionService(ILogger<ClasificacionService> logger, IRedisService redisService) : IClasificacionService
     {
         private readonly ILogger<ClasificacionService> _logger = logger;
+        private readonly IRedisService _redisService = redisService;
 
         /// <summary>
         /// Obtiene la clasificación de equipos desde una URL externa.
         /// </summary>
         /// <returns>Lista de equipos con su clasificación.</returns>
-        public async Task<List<GetEquipoResponse>> GetClasificacion()
+        public async Task<GetClasificacionResponse> GetClasificacion()
         {
             try
             {
-                string url = "https://www.sport.es/resultados/futbol/primera-division/clasificacion-liga.html";
-                var document = await LoadDocumentFromUrl(url);
-                var equiposData = ExtractEquiposData(document);
-                return equiposData.Select(equipo =>
+                var equiposData = await _redisService.GetFromRedis<ClasificacionDeLiga>("LaLiga");
+
+                if (equiposData == null || MustUpdate(equiposData.LastUpdated))
                 {
-                    return new GetEquipoResponse
+                    string url = "https://www.sport.es/resultados/futbol/primera-division/clasificacion-liga.html";
+                    var document = await LoadDocumentFromUrl(url);
+                    equiposData = new ClasificacionDeLiga
                     {
-                        Equipo = equipo
+                        Equipos = ExtractEquiposData(document),
+                        LastUpdated = DateTime.Now
                     };
-                }).ToList();
+
+                    await _redisService.SaveInRedis("LaLiga", equiposData);
+                }
+
+                return new GetClasificacionResponse
+                {
+                    Clasificacion = equiposData
+                };
+                
             }
             catch (Exception ex)
             {
@@ -38,6 +49,7 @@ namespace LaLigaApplication.Clasificacion.Services
                 throw new ClasificacionServiceException("Error al obtener la clasificación", ex);
             }
         }
+       
 
         /// <summary>
         /// Carga la página web a partir de la url proporcionada
@@ -103,6 +115,17 @@ namespace LaLigaApplication.Clasificacion.Services
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Indica si hay que actualizar la clasificación porque ya pasó el domingo
+        /// </summary>
+        /// <returns>Debe actualizar o no</returns>
+        private bool MustUpdate(DateTime lastUpdated)
+        {
+            var nextSunday = lastUpdated.AddDays((int)DayOfWeek.Sunday - (int)lastUpdated.DayOfWeek).AddDays(7);
+
+            return DateTime.Now > nextSunday;
         }
     }
 }

@@ -11,6 +11,6 @@ namespace LaLigaApplication.Clasificacion.Services
         /// Obtiene la clasificación de equipos.
         /// </summary>
         /// <returns>Lista de equipos con su clasificación.</returns>
-        Task<List<GetEquipoResponse>> GetClasificacion();
+        Task<GetClasificacionResponse> GetClasificacion();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using HtmlAgilityPack;
 using LaLigaApplication.Clasificacion.DTOs;
 using LaLigaApplication.Clasificacion.Services;
+using LaLigaInfraestructure.Redis;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -22,15 +23,17 @@ namespace LaLigaApplication.UnitTests.Clasificacion.Services
         {
             // Arrange
             var loggerMock = new Mock<ILogger<ClasificacionService>>();
-            var service = new ClasificacionService(loggerMock.Object);
+            var redisMock = new Mock<IRedisService>();
+            var service = new ClasificacionService(loggerMock.Object, redisMock.Object);
 
             // Act
             var result = await service.GetClasificacion();
 
             // Assert
             Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.InstanceOf<List<GetEquipoResponse>>());
-            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Is.InstanceOf<GetClasificacionResponse>());
+            Assert.That(result.Clasificacion.Equipos, Is.Not.Null);
+            Assert.That(result.Clasificacion.Equipos, Is.Not.Empty);
         }
 
 
