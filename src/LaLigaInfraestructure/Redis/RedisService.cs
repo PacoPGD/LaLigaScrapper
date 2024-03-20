@@ -9,7 +9,7 @@ namespace LaLigaInfraestructure.Redis
 
         public async Task SaveInRedis<T>(string key, T value)
         {
-            var serializedValue = JsonConvert.SerializeObject(value);z
+            var serializedValue = JsonConvert.SerializeObject(value);
             await _redisDatabase.StringSetAsync(key, serializedValue);
         }
 
