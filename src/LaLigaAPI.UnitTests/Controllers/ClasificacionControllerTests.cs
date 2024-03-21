@@ -28,10 +28,9 @@ namespace LaLigaAPI.UnitTests.Controllers
                        {
                            Clasificacion = new ClasificacionDeLiga
                            {
-                               Equipos = new List<Equipo>
-                               {
-                                   new Equipo
-                                   {
+                               Equipos =
+                               [
+                                   new() {
                                        Nombre = "Los satanases del infierno",
                                        Posicion = 1,
                                        PartidosJugados = 0,
@@ -42,7 +41,7 @@ namespace LaLigaAPI.UnitTests.Controllers
                                        GolesFavor = 0,
                                        GolesContra = 0
                                    }
-                               },
+                               ],
                                LastUpdated = DateTime.Now
                            }
                        });

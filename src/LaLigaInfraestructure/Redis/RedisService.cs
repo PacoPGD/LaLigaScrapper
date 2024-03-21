@@ -20,6 +20,7 @@ namespace LaLigaInfraestructure.Redis
             {
                 return default;
             }
+
             return JsonConvert.DeserializeObject<T>(serializedValue);
         }
     }
