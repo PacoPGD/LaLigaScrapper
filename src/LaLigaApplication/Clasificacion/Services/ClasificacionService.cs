@@ -121,7 +121,7 @@ namespace LaLigaApplication.Clasificacion.Services
         /// Indica si hay que actualizar la clasificación porque ya pasó el domingo
         /// </summary>
         /// <returns>Debe actualizar o no</returns>
-        private bool MustUpdate(DateTime lastUpdated)
+        private static bool MustUpdate(DateTime lastUpdated)
         {
             var nextSunday = lastUpdated.AddDays((int)DayOfWeek.Sunday - (int)lastUpdated.DayOfWeek).AddDays(7);
 
